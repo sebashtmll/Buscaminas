@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import Cell from '../components/Cell';
 
@@ -9,6 +10,7 @@ const GameBoard = ({
   gameOver,
   level
 }) => {
+  const [localBoard, setLocalBoard] = useState(board);
   // Configuración del tamaño de celda según el nivel
   const getCellSize = () => {
     const windowWidth = Dimensions.get('window').width;
@@ -22,7 +24,18 @@ const GameBoard = ({
     }
   };
 
+
   const cellSize = getCellSize();
+
+  // Handler para pulsación larga (bandera)
+  const handleCellLongPress = (rowIndex, colIndex) => {
+    if (typeof onCellLongPress === 'function') {
+      onCellLongPress(rowIndex, colIndex);
+    } else {
+      // Si no se pasa handler, alterna bandera localmente
+      // setLocalBoard(toggleFlag(localBoard, rowIndex, colIndex));
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -34,7 +47,7 @@ const GameBoard = ({
               cell={cell}
               size={cellSize}
               onPress={() => onCellPress(rowIndex, colIndex)}
-              onLongPress={() => onCellLongPress(rowIndex, colIndex)}
+              onLongPress={() => handleCellLongPress(rowIndex, colIndex)}
               disabled={disabled || gameOver}
               gameOver={gameOver}
             />

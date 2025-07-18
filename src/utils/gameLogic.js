@@ -105,3 +105,13 @@ export const getLevelConfig = (level) => {
       return { rows: 9, cols: 9, mines: 10 };
   }
 };
+
+// Alterna el estado de bandera en una celda
+export const toggleFlag = (board, row, col) => {
+  const newBoard = JSON.parse(JSON.stringify(board));
+  const cell = newBoard[row][col];
+  if (!cell.revealed) {
+    cell.flagged = !cell.flagged;
+  }
+  return newBoard;
+};
