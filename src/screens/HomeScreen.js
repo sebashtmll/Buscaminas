@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Button, StyleSheet, Text, View } from 'react-native';
+import { Button, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import GameBoard from '../components/GameBoard';
 import { checkGameStatus, createBoard, revealCell, toggleFlag } from '../utils/gameLogic';
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -34,14 +35,46 @@ const BOARD_COLS = 9;
 const BOARD_MINES = 10;
 
 const HomeScreen = ({ navigation }) => {
-  const [mode, setMode] = useState(null); // null, 'single', 'multi'
+  const [mode, setMode] = useState(null); // null al inicio para mostrar Menú Principal
   const [board, setBoard] = useState(createBoard(BOARD_ROWS, BOARD_COLS, BOARD_MINES));
   const [gameOver, setGameOver] = useState(false);
   const [won, setWon] = useState(false);
+  const [customRows, setCustomRows] = useState('8');
+  const [customCols, setCustomCols] = useState('8');
+  const [customMines, setCustomMines] = useState('10');
+  const [showModeSelect, setShowModeSelect] = useState(false);
+
+  const resetGame = () => {
+    let rows = BOARD_ROWS, cols = BOARD_COLS, mines = BOARD_MINES;
+    if (mode === 'beginner') {
+      rows = 8; cols = 8; mines = 10;
+    } else if (mode === 'intermediate') {
+      rows = 16; cols = 16; mines = 40;
+    } else if (mode === 'custom') {
+      rows = parseInt(customRows) || 8;
+      cols = parseInt(customCols) || 8;
+      mines = parseInt(customMines) || 10;
+    }
+    setBoard(createBoard(rows, cols, mines));
+    setGameOver(false);
+    setWon(false);
+  };
 
   const startGame = (selectedMode) => {
+    let rows = BOARD_ROWS, cols = BOARD_COLS, mines = BOARD_MINES;
+    if (selectedMode === 'beginner') {
+      rows = 8; cols = 8; mines = 10;
+    } else if (selectedMode === 'intermediate') {
+      rows = 16; cols = 16; mines = 40;
+    } else if (selectedMode === 'custom') {
+      rows = parseInt(customRows) || 8;
+      cols = parseInt(customCols) || 8;
+      const maxMines = rows * cols - 1;
+      mines = Math.min(parseInt(customMines) || 10, maxMines);
+     setCustomMines(mines);
+    }
     setMode(selectedMode);
-    setBoard(createBoard(BOARD_ROWS, BOARD_COLS, BOARD_MINES));
+    setBoard(createBoard(rows, cols, mines));
     setGameOver(false);
     setWon(false);
   };
@@ -62,21 +95,15 @@ const HomeScreen = ({ navigation }) => {
     setBoard(toggleFlag(board, row, col));
   };
 
-  const resetGame = () => {
-    setBoard(createBoard(BOARD_ROWS, BOARD_COLS, BOARD_MINES));
-    setGameOver(false);
-    setWon(false);
-  };
-
-  // Si el usuario aún no ha elegido modo, muestra el menú
-  if (!mode) {
+  // Menú principal
+  if (!showModeSelect && mode === null) {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Buscaminas Multiplayer</Text>
         <View style={styles.buttonGroup}>
           <Button
             title="Un Jugador"
-            onPress={() => startGame('single')}
+            onPress={() => setShowModeSelect(true)}
           />
           <Button
             title="Multijugador (LAN)"
@@ -91,20 +118,148 @@ const HomeScreen = ({ navigation }) => {
     );
   }
 
-  // Si el usuario eligió "Un Jugador", muestra el tablero
+  // Selección de modo de juego para un jugador
+  if (showModeSelect && (mode === null || mode === 'custom')) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>Selecciona el modo de juego</Text>
+        <View style={styles.buttonGroup}>
+          <Button title="Principiante (8x8, 10 minas)" onPress={() => startGame('beginner')} />
+          <Button title="Intermedio (16x16, 40 minas)" onPress={() => startGame('intermediate')} />
+          <Button title="Personalizado" onPress={() => setMode('custom')} />
+          <Button title="Volver" onPress={() => setShowModeSelect(false)} />
+        </View>
+        {mode === 'custom' && (
+          <View style={{ marginTop: 20, width: '80%' }}>
+            <View style={{ marginBottom: 10 }}>
+              <Text>Filas:</Text>
+              <TextInput
+                style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 5, padding: 8, textAlign: 'center', backgroundColor: '#fafafa' }}
+                keyboardType="numeric"
+                value={customRows}
+                onChangeText={(text) => {
+                  setCustomRows(text.replace(/[^0-9]/g, ''));
+                }}
+                onBlur={() => {
+                  let val = parseInt(customRows);
+                  if (!val || customRows === '') {
+                    setCustomRows('8');
+                  } else if (val < 8) {
+                    setCustomRows('8');
+                  } else if (val > 30) {
+                    setCustomRows('30');
+                  } else {
+                    setCustomRows(val.toString());
+                  }
+                  // Ajustar minas si el tamaño cambia
+                  const rowsVal = (!val || customRows === '') ? 8 : Math.max(8, Math.min(30, val));
+                  const colsVal = parseInt(customCols) || 8;
+                  let maxMines = Math.min(99, colsVal);
+                  if (parseInt(customMines) > maxMines) setCustomMines(maxMines.toString());
+                  if (parseInt(customMines) < 10) setCustomMines('10');
+                }}
+                placeholder="8-30"
+              />
+            </View>
+            <View style={{ marginBottom: 10 }}>
+              <Text>Columnas:</Text>
+              <TextInput
+                style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 5, padding: 8, textAlign: 'center', backgroundColor: '#fafafa' }}
+                keyboardType="numeric"
+                value={customCols}
+                onChangeText={(text) => {
+                  setCustomCols(text.replace(/[^0-9]/g, ''));
+                }}
+                onBlur={() => {
+                  let val = parseInt(customCols);
+                  if (!val || customCols === '') {
+                    setCustomCols('8');
+                  } else if (val < 8) {
+                    setCustomCols('8');
+                  } else if (val > 30) {
+                    setCustomCols('30');
+                  } else {
+                    setCustomCols(val.toString());
+                  }
+                  const colsVal = (!val || customCols === '') ? 8 : Math.max(8, Math.min(30, val));
+                  const rowsVal = parseInt(customRows) || 8;
+                  let maxMines = Math.min(99, colsVal);
+                  if (parseInt(customMines) > maxMines) setCustomMines(maxMines.toString());
+                  if (parseInt(customMines) < 10) setCustomMines('10');
+                }}
+                placeholder="8-30"
+              />
+            </View>
+            <View style={{ marginBottom: 10 }}>
+              <Text>Minas:</Text>
+              <TextInput
+                style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 5, padding: 8, textAlign: 'center', backgroundColor: '#fafafa' }}
+                keyboardType="numeric"
+                value={customMines}
+                onChangeText={(text) => {
+                  setCustomMines(text.replace(/[^0-9]/g, ''));
+                }}
+                onBlur={() => {
+                  const rowsVal = parseInt(customRows) || 8;
+                  const colsVal = parseInt(customCols) || 8;
+                  let maxMines = Math.min(99, rowsVal * colsVal);
+                  let mines = parseInt(customMines);
+                  if (!mines || customMines === '') {
+                    setCustomMines('10');
+                  } else if (mines < 10) {
+                    setCustomMines('10');
+                  } else if (mines > maxMines) {
+                    setCustomMines(maxMines.toString());
+                  } else {
+                    setCustomMines(mines.toString());
+                  }
+                }}
+                placeholder={`10-${Math.min(99, (parseInt(customRows) || 8) * (parseInt(customCols) || 8))}`}
+              />
+            </View>
+            <Button title="Jugar personalizado" onPress={() => {
+              // Solo crear el tablero y salir del menú de selección cuando el usuario presione el botón
+              const rows = parseInt(customRows) || 8;
+              const cols = parseInt(customCols) || 8;
+              const mines = parseInt(customMines) || 10;
+              setBoard(createBoard(rows, cols, mines));
+              setGameOver(false);
+              setWon(false);
+              setShowModeSelect(false);
+            }} />
+          </View>
+        )}
+      </View>
+    );
+  }
+
+  // Juego en modo seleccionado
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
-        {mode === 'single' ? 'Modo Un Jugador' : 'Modo Multijugador'}
+        {mode === 'beginner' ? 'Principiante' : mode === 'intermediate' ? 'Intermedio' : 'Personalizado'}
       </Text>
-      <GameBoard
-        board={board}
-        onCellPress={handleCellPress}
-        onCellLongPress={handleCellLongPress}
-        disabled={gameOver}
-        gameOver={gameOver}
-        level="beginner"
-      />
+      <ScrollView
+        style={{ width: '100%' }}
+        contentContainerStyle={{ alignItems: 'center', justifyContent: 'center' }}
+        horizontal={true}
+        showsHorizontalScrollIndicator={true}
+      >
+        <ScrollView
+          style={{ width: '100%' }}
+          contentContainerStyle={{ alignItems: 'center', justifyContent: 'center' }}
+          showsVerticalScrollIndicator={true}
+        >
+          <GameBoard
+            board={board}
+            onCellPress={handleCellPress}
+            onCellLongPress={handleCellLongPress}
+            disabled={gameOver}
+            gameOver={gameOver}
+            level={mode}
+          />
+        </ScrollView>
+      </ScrollView>
       {gameOver && (
         <Text style={styles.result}>
           {won ? '¡Ganaste!' : '¡Perdiste!'}
@@ -112,7 +267,7 @@ const HomeScreen = ({ navigation }) => {
       )}
       <View style={styles.buttonGroup}>
         <Button title="Reiniciar Juego" onPress={resetGame} />
-        <Button title="Volver al Menú" onPress={() => setMode(null)} />
+        <Button title="Volver al Menú" onPress={() => { setMode(null); setShowModeSelect(false); }} />
       </View>
     </View>
   );
