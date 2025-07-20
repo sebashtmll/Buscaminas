@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { Alert, Button, ScrollView, StyleSheet, View } from 'react-native';
-import Cell from '../components/Cell';
+import { Alert, Button, ScrollView, StyleSheet, View, Dimensions } from 'react-native';
+import GameBoard from '../components/GameBoard';
 import GameStatus from '../components/GameStatus';
 import PlayerInfo from '../components/PlayerInfo';
 import { checkGameStatus, createBoard, getLevelConfig, revealCell } from '../utils/gameLogic';
 import { closeSocket, initSocket, sendMove, subscribeToGameUpdates } from '../utils/socketManager';
 
 const GameScreen = ({ route, navigation }) => {
-  const { mode, role, ipAddress, port, username } = route.params || {};
+  const { mode, role, ipAddress, port, username, rows, cols, mines } = route.params || {};
   const [board, setBoard] = useState([]);
   const [gameOver, setGameOver] = useState(false);
   const [won, setWon] = useState(false);
@@ -21,7 +21,7 @@ const GameScreen = ({ route, navigation }) => {
 
   // Inicializar el juego
   useEffect(() => {
-    const config = getLevelConfig(level);
+    const config = { rows: rows || 9, cols: cols || 9, mines: mines || 10 };
     const initialBoard = createBoard(config.rows, config.cols, config.mines);
     setBoard(initialBoard);
 
@@ -46,7 +46,7 @@ const GameScreen = ({ route, navigation }) => {
 
       return () => closeSocket(socketRef.current);
     }
-  }, [level, mode]);
+  }, [rows, cols, mines, mode]);
 
   const handleCellPress = (row, col) => {
     if (gameOver || (mode === 'multiplayer' && currentPlayer !== (role === 'host' ? 'player1' : 'player2'))) {
@@ -206,21 +206,24 @@ const GameScreen = ({ route, navigation }) => {
         )}
       </View>
       
-      <ScrollView contentContainerStyle={styles.boardContainer}>
-        {board.map((row, rowIndex) => (
-          <View key={rowIndex} style={styles.row}>
-            {row.map((cell, colIndex) => (
-              <Cell
-                key={`${rowIndex}-${colIndex}`}
-                cell={cell}
-                onPress={() => handleCellPress(rowIndex, colIndex)}
-                onLongPress={() => handleCellLongPress(rowIndex, colIndex)}
-                disabled={gameOver || (mode === 'multiplayer' && 
-                  currentPlayer !== (role === 'host' ? 'player1' : 'player2'))}
-              />
-            ))}
-          </View>
-        ))}
+      <ScrollView
+        horizontal
+        contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}
+        style={{ maxHeight: Dimensions.get('window').height * 0.6 }}
+      >
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}
+          style={{ minWidth: 300 }}
+        >
+          <GameBoard
+            board={board}
+            onCellPress={handleCellPress}
+            onCellLongPress={handleCellLongPress}
+            disabled={gameOver || (mode === 'multiplayer' && currentPlayer !== (role === 'host' ? 'player1' : 'player2'))}
+            gameOver={gameOver}
+            level={null}
+          />
+        </ScrollView>
       </ScrollView>
       
       <View style={styles.buttonContainer}>

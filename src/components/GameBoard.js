@@ -10,22 +10,19 @@ const GameBoard = ({
   gameOver,
   level
 }) => {
-  const [localBoard, setLocalBoard] = useState(board);
-  // Configuración del tamaño de celda según el nivel
-  const getCellSize = () => {
-    const windowWidth = Dimensions.get('window').width;
-    switch (level) {
-      case 'intermediate':
-        return (windowWidth - 40) / 16; // 16 columnas
-      case 'expert':
-        return (windowWidth - 40) / 30; // 30 columnas
-      default: // beginner
-        return (windowWidth - 40) / 9; // 9 columnas
-    }
-  };
-
-
-  const cellSize = getCellSize();
+  // Calcular tamaño de celda dinámicamente según el tamaño del tablero
+  const windowWidth = Dimensions.get('window').width;
+  const windowHeight = Dimensions.get('window').height;
+  const numRows = board.length || 8;
+  const numCols = board[0]?.length || 8;
+  // Dejar margen para scrollbars y paddings
+  const maxBoardWidth = windowWidth * 0.95;
+  const maxBoardHeight = windowHeight * 0.55;
+  // Tamaño de celda para que el tablero quepa en pantalla, pero no menor a 28px
+  const cellSize = Math.max(28, Math.min(
+    Math.floor(maxBoardWidth / numCols),
+    Math.floor(maxBoardHeight / numRows)
+  ));
 
   // Handler para pulsación larga (bandera)
   const handleCellLongPress = (rowIndex, colIndex) => {
@@ -38,7 +35,20 @@ const GameBoard = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          width: cellSize * numCols,
+          height: cellSize * numRows,
+          minWidth: 200,
+          minHeight: 200,
+          alignSelf: 'center',
+          justifyContent: 'center',
+          alignItems: 'center',
+        },
+      ]}
+    >
       {board.map((row, rowIndex) => (
         <View key={`row-${rowIndex}`} style={styles.row}>
           {row.map((cell, colIndex) => (
