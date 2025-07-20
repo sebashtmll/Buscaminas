@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import { StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native';
 
 const MultiplayerSetup = ({ navigation }) => {
   const [ipAddress, setIpAddress] = useState('');
@@ -7,7 +7,7 @@ const MultiplayerSetup = ({ navigation }) => {
   const [username, setUsername] = useState('');
 
   const handleHostGame = () => {
-    navigation.navigate('Game', { 
+    navigation.navigate('GameScreen', { 
       mode: 'multiplayer',
       role: 'host',
       ipAddress,
@@ -17,7 +17,7 @@ const MultiplayerSetup = ({ navigation }) => {
   };
 
   const handleJoinGame = () => {
-    navigation.navigate('Game', { 
+    navigation.navigate('GameScreen', { 
       mode: 'multiplayer',
       role: 'guest',
       ipAddress,
@@ -54,9 +54,26 @@ const MultiplayerSetup = ({ navigation }) => {
       />
       
       <View style={styles.buttonGroup}>
-        <Button title="Crear Partida" onPress={handleHostGame} />
-        <Button title="Unirse a Partida" onPress={handleJoinGame} />
+        <TouchableOpacity style={styles.button} onPress={handleHostGame}>
+          <Text style={styles.buttonText}>Crear Partida</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={handleJoinGame}>
+          <Text style={styles.buttonText}>Unirse a Partida</Text>
+        </TouchableOpacity>
       </View>
+  button: {
+    backgroundColor: '#2196F3',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
     </View>
   );
 };
@@ -85,6 +102,19 @@ const styles = StyleSheet.create({
     height: 100,
     justifyContent: 'space-between',
     marginTop: 20,
+  },
+  button: {
+    backgroundColor: '#2196F3',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

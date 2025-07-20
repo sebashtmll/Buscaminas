@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { Alert, Button, ScrollView, StyleSheet, View } from 'react-native';
 import Cell from '../components/Cell';
 import GameStatus from '../components/GameStatus';
 import PlayerInfo from '../components/PlayerInfo';
