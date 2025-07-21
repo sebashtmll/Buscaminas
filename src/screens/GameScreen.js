@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Alert, Button, ScrollView, StyleSheet, View, Dimensions } from 'react-native';
+import { Alert, Button, Dimensions, ScrollView, StyleSheet, View } from 'react-native';
 import GameBoard from '../components/GameBoard';
 import GameStatus from '../components/GameStatus';
 import PlayerInfo from '../components/PlayerInfo';
@@ -16,25 +16,46 @@ const GameScreen = ({ route, navigation }) => {
     player1: { username: mode === 'single' ? 'Tú' : username || 'Jugador 1', moves: 0, score: 0, flags: 0 },
     player2: { username: mode === 'single' ? 'CPU' : 'Oponente', moves: 0, score: 0, flags: 0 }
   });
-  const [level, setLevel] = useState('beginner');
+  const [level] = useState('beginner');
   const socketRef = useRef(null);
 
   // Inicializar el juego
+  const [waitingForGuest, setWaitingForGuest] = useState(false);
   useEffect(() => {
-    const config = { rows: rows || 9, cols: cols || 9, mines: mines || 10 };
-    const initialBoard = createBoard(config.rows, config.cols, config.mines);
-    setBoard(initialBoard);
-
     if (mode === 'multiplayer') {
-      // Configurar conexión de sockets
       socketRef.current = initSocket(ipAddress, port, role === 'host', username);
-      
+
+      if (role === 'host') {
+        setWaitingForGuest(true);
+        // Esperar a que un invitado se una (evento 'guest-joined')
+        socketRef.current.on('guest-joined', () => {
+          setWaitingForGuest(false);
+          // Ahora sí crear y enviar el tablero
+          const config = { rows: rows || 9, cols: cols || 9, mines: mines || 10 };
+          const initialBoard = createBoard(config.rows, config.cols, config.mines);
+          setBoard(initialBoard);
+          sendMove(socketRef.current, {
+            type: 'init',
+            board: initialBoard,
+            players,
+            nextPlayer: 'player1',
+            gameOver: false,
+            won: false
+          });
+        });
+      }
+
       subscribeToGameUpdates(socketRef.current, (data) => {
-        if (data.type === 'move') {
+        if (data.type === 'init') {
+          setBoard(data.board);
+          setPlayers(data.players);
+          setCurrentPlayer(data.nextPlayer);
+          setGameOver(data.gameOver);
+          setWon(data.won);
+        } else if (data.type === 'move') {
           setBoard(data.board);
           setCurrentPlayer(data.nextPlayer);
           setPlayers(data.players);
-          
           const status = checkGameStatus(data.board);
           if (status.gameOver) {
             setGameOver(true);
@@ -45,8 +66,13 @@ const GameScreen = ({ route, navigation }) => {
       });
 
       return () => closeSocket(socketRef.current);
+    } else {
+      // Juego individual: crear tablero local
+      const config = { rows: rows || 9, cols: cols || 9, mines: mines || 10 };
+      const initialBoard = createBoard(config.rows, config.cols, config.mines);
+      setBoard(initialBoard);
     }
-  }, [rows, cols, mines, mode]);
+  }, [rows, cols, mines, mode, role]);
 
   const handleCellPress = (row, col) => {
     if (gameOver || (mode === 'multiplayer' && currentPlayer !== (role === 'host' ? 'player1' : 'player2'))) {
@@ -183,53 +209,74 @@ const GameScreen = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      <GameStatus 
-        gameOver={gameOver} 
-        won={won} 
-        currentPlayer={currentPlayer}
-        playerTurn={mode === 'multiplayer' ? 
-          (currentPlayer === (role === 'host' ? 'player1' : 'player2')) : true}
-      />
-      
-      <View style={styles.playersContainer}>
-        <PlayerInfo 
-          player={players.player1} 
-          isCurrent={currentPlayer === 'player1'} 
-          isYou={role === 'host' || mode === 'single'}
-        />
-        {mode === 'multiplayer' && (
-          <PlayerInfo 
-            player={players.player2} 
-            isCurrent={currentPlayer === 'player2'} 
-            isYou={role !== 'host'}
+      {waitingForGuest && role === 'host' ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <GameStatus 
+            gameOver={false}
+            won={false}
+            currentPlayer={null}
+            playerTurn={false}
           />
-        )}
-      </View>
-      
-      <ScrollView
-        horizontal
-        contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}
-        style={{ maxHeight: Dimensions.get('window').height * 0.6 }}
-      >
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}
-          style={{ minWidth: 300 }}
-        >
-          <GameBoard
-            board={board}
-            onCellPress={handleCellPress}
-            onCellLongPress={handleCellLongPress}
-            disabled={gameOver || (mode === 'multiplayer' && currentPlayer !== (role === 'host' ? 'player1' : 'player2'))}
-            gameOver={gameOver}
-            level={null}
+          <View style={{ marginTop: 40 }}>
+            <Button title="Cancelar" onPress={() => navigation.goBack()} />
+          </View>
+          <View style={{ marginTop: 20 }}>
+            <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 8 }}>
+              Esperando invitado...
+            </Text>
+            <Text style={{ fontSize: 16, textAlign: 'center' }}>
+              Comparte tu IP y puerto para que otro jugador se una.
+            </Text>
+          </View>
+        </View>
+      ) : (
+        <>
+          <GameStatus 
+            gameOver={gameOver} 
+            won={won} 
+            currentPlayer={currentPlayer}
+            playerTurn={mode === 'multiplayer' ? 
+              (currentPlayer === (role === 'host' ? 'player1' : 'player2')) : true}
           />
-        </ScrollView>
-      </ScrollView>
-      
-      <View style={styles.buttonContainer}>
-        <Button title="Reiniciar" onPress={restartGame} />
-        <Button title="Cambiar Nivel" onPress={() => navigation.goBack()} />
-      </View>
+          <View style={styles.playersContainer}>
+            <PlayerInfo 
+              player={players.player1} 
+              isCurrent={currentPlayer === 'player1'} 
+              isYou={role === 'host' || mode === 'single'}
+            />
+            {mode === 'multiplayer' && (
+              <PlayerInfo 
+                player={players.player2} 
+                isCurrent={currentPlayer === 'player2'} 
+                isYou={role !== 'host'}
+              />
+            )}
+          </View>
+          <ScrollView
+            horizontal
+            contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}
+            style={{ maxHeight: Dimensions.get('window').height * 0.6 }}
+          >
+            <ScrollView
+              contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}
+              style={{ minWidth: 300 }}
+            >
+              <GameBoard
+                board={board}
+                onCellPress={handleCellPress}
+                onCellLongPress={handleCellLongPress}
+                disabled={gameOver || (mode === 'multiplayer' && currentPlayer !== (role === 'host' ? 'player1' : 'player2'))}
+                gameOver={gameOver}
+                level={null}
+              />
+            </ScrollView>
+          </ScrollView>
+          <View style={styles.buttonContainer}>
+            <Button title="Reiniciar" onPress={restartGame} />
+            <Button title="Cambiar Nivel" onPress={() => navigation.goBack()} />
+          </View>
+        </>
+      )}
     </View>
   );
 };

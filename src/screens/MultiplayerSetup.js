@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { checkLobbyExists } from '../utils/lobbyChecker';
 
 const MultiplayerSetup = ({ navigation }) => {
   const [ipAddress, setIpAddress] = useState('');
@@ -83,9 +84,16 @@ const MultiplayerSetup = ({ navigation }) => {
     });
   };
 
-  const handleJoinGame = () => {
+   const handleJoinGame = async () => {
     if (!validateInputs()) return;
-    navigation.navigate('GameScreen', { 
+    // Verificar si existe la partida antes de navegar
+    const exists = await checkLobbyExists(ipAddress, port);
+    if (!exists) {
+      Alert.alert('No se encontró partida', 'No existe ninguna partida creada en ese IP y puerto.');
+      return;
+    }
+
+    navigation.navigate('GameScreen', {
       mode: 'multiplayer',
       role: 'guest',
       ipAddress,

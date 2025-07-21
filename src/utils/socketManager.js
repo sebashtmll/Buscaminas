@@ -21,15 +21,22 @@ export const closeSocket = () => {
 
 export const sendMove = (socket, data) => {
   if (socket) {
-    // Convertir datos a Buffer para optimización
     const bufferData = Buffer.from(JSON.stringify(data));
-    socket.emit('game-move', bufferData);
+    if (data.type === 'init') {
+      socket.emit('init-game', bufferData);
+    } else {
+      socket.emit('game-move', bufferData);
+    }
   }
 };
 
 export const subscribeToGameUpdates = (socket, callback) => {
   if (socket) {
-    socket.on('game-update', (bufferData) => {
+    socket.on('init-game', (bufferData) => {
+      const data = JSON.parse(bufferData.toString());
+      callback(data);
+    });
+    socket.on('game-move', (bufferData) => {
       const data = JSON.parse(bufferData.toString());
       callback(data);
     });
