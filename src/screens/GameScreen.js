@@ -541,7 +541,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 15,
-    backgroundColor: "#2C3E50",
+    backgroundColor: "#282639",
   },
   playersContainer: {
     flexDirection: "row",
@@ -567,7 +567,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   backButton: {
-    backgroundColor: "#95A5A6",
+    backgroundColor: "#065e64ff",
     padding: 15,
     borderRadius: 10,
     alignItems: "center",

@@ -68,12 +68,12 @@ const styles = StyleSheet.create({
   name: {
     fontWeight: "bold",
     marginBottom: 8,
-    fontSize: 16,
-    color: "#2C3E50",
+    fontSize: 20,
+    color: "#ffffffff",
   },
   stat: {
-    fontSize: 14,
-    color: "#34495E",
+    fontSize: 15,
+    color: "#ffffffff",
     marginBottom: 2,
   },
 })

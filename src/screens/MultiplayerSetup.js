@@ -559,17 +559,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
-    backgroundColor: "#2C3E50",
+    backgroundColor: "#282639",
   },
   title: {
-    fontSize: 24,
+    fontSize: 30,
     marginBottom: 30,
     fontWeight: "bold",
     color: "#FFFFFF",
     textAlign: "center",
   },
   subtitle: {
-    fontSize: 20,
+    fontSize: 26,
     marginBottom: 20,
     fontWeight: "bold",
     color: "#FFFFFF",
@@ -604,7 +604,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   primaryButton: {
-    backgroundColor: "#3498DB",
+    backgroundColor: "#299146ff",
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
@@ -616,7 +616,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   secondaryButton: {
-    backgroundColor: "#E67E22",
+    backgroundColor: "#426121ff",
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
@@ -628,7 +628,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   backButton: {
-    backgroundColor: "#95A5A6",
+    backgroundColor: "#b8470aff",
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
@@ -645,14 +645,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   customOptions: {
-    width: "90%",
+    width: "80%",
   },
   inputGroup: {
     marginBottom: 15,
   },
   inputLabel: {
     color: "#FFFFFF",
-    fontSize: 16,
+    fontSize: 18,
     marginBottom: 8,
     fontWeight: "bold",
   },

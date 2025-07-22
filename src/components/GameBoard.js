@@ -139,7 +139,7 @@ const GameBoard = ({ board, onCellPress, onCellLongPress, disabled, gameOver, le
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#34495E",
+    backgroundColor: "#282639",
     padding: 15,
     borderRadius: 10,
     marginVertical: 10,

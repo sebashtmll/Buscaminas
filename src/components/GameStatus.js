@@ -46,7 +46,7 @@ const GameStatus = ({ gameOver, won, currentPlayer, playerTurn }) => {
   if (gameOver) {
     return (
       <View style={[styles.container, won ? styles.won : styles.lost]}>
-        <Text style={styles.text}>{won ? "¡Ganaste!" : "¡Perdiste!"}</Text>
+        <Text style={styles.text}>{won ? "¡Has ganado!" : "¡Haz Perdido!"}</Text>
       </View>
     )
   }
@@ -73,6 +73,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    marginTop:2,
   },
   won: {
     backgroundColor: "#32F028",

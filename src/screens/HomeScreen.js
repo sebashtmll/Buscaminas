@@ -359,13 +359,13 @@ const HomeScreen = ({ navigation }) => {
   if (!showModeSelect && mode === null) {
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>Buscaminas</Text>
+        <Text style={styles.title}>BUSCAMINAS</Text>
         <View style={styles.buttonGroup}>
           <TouchableOpacity style={styles.primaryButton} onPress={() => setShowModeSelect(true)}>
-            <Text style={styles.buttonText}>Un Jugador</Text>
+            <Text style={styles.buttonText}>👤 Un Jugador</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.navigate("MultiplayerSetup")}>
-            <Text style={styles.buttonText}>Multijugador</Text>
+            <Text style={styles.buttonText}>👥 Multijugador</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -378,17 +378,17 @@ const HomeScreen = ({ navigation }) => {
       <View style={styles.container}>
         <Text style={styles.title}>Selecciona Dificultad</Text>
         <View style={styles.buttonGroup}>
-          <TouchableOpacity style={styles.difficultyButton} onPress={() => startGame("beginner")}>
+          <TouchableOpacity style={styles.difficultyButtonb} onPress={() => startGame("beginner")}>
             <Text style={styles.buttonText}>Principiante</Text>
-            <Text style={styles.difficultyText}>8x8, 10 minas</Text>
+            <Text style={styles.difficultyText}>8x8 - 10 minas</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.difficultyButton} onPress={() => startGame("intermediate")}>
+          <TouchableOpacity style={styles.difficultyButtoni} onPress={() => startGame("intermediate")}>
             <Text style={styles.buttonText}>Intermedio</Text>
-            <Text style={styles.difficultyText}>16x16, 40 minas</Text>
+            <Text style={styles.difficultyText}>16x16 - 40 minas</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.difficultyButton} onPress={() => setMode("custom")}>
+          <TouchableOpacity style={styles.difficultyButtonc} onPress={() => setMode("custom")}>
             <Text style={styles.buttonText}>Personalizado</Text>
           </TouchableOpacity>
 
@@ -547,23 +547,23 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     padding: 20,
-    backgroundColor: "#2C3E50",
+    backgroundColor: "#282639",
   },
   title: {
-    fontSize: 28,
+    fontSize: 55,
     marginBottom: 30,
     fontWeight: "bold",
     color: "#FFFFFF",
     textAlign: "center",
   },
   buttonGroup: {
-    width: "90%",
-    marginVertical: 20,
+    width: "80%",
+    marginVertical: 10,
   },
   primaryButton: {
-    backgroundColor: "#3498DB",
+    backgroundColor: "#76aceeff",
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 15,
     alignItems: "center",
     marginBottom: 15,
     shadowColor: "#000",
@@ -573,7 +573,19 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   secondaryButton: {
-    backgroundColor: "#E67E22",
+    backgroundColor: "#3ad666ff",
+    padding: 25,
+    borderRadius: 15,
+    alignItems: "center",
+    marginBottom: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  difficultyButtonb: {
+    backgroundColor: "#467dc2ff",
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
@@ -584,8 +596,20 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
-  difficultyButton: {
-    backgroundColor: "#27AE60",
+  difficultyButtoni: {
+    backgroundColor: "#219141ff",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginBottom: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  difficultyButtonc: {
+    backgroundColor: "#c99526ff",
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
@@ -597,11 +621,11 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   backButton: {
-    backgroundColor: "#95A5A6",
-    padding: 15,
+    backgroundColor: "#065e64ff",
+    padding: 8,
     borderRadius: 10,
     alignItems: "center",
-    marginBottom: 15,
+    marginBottom: 5,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
@@ -610,7 +634,7 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     backgroundColor: "#E74C3C",
-    padding: 15,
+    padding: 8,
     borderRadius: 10,
     alignItems: "center",
     flex: 1,
@@ -623,17 +647,16 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#FFFFFF",
-    fontSize: 16,
+    fontSize: 26,
     fontWeight: "bold",
   },
   difficultyText: {
     color: "#FFFFFF",
-    fontSize: 12,
+    fontSize: 16,
     marginTop: 5,
   },
   customContainer: {
     width: "90%",
-    marginTop: 20,
   },
   inputGroup: {
     marginBottom: 15,
@@ -648,10 +671,10 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#34495E",
     borderRadius: 8,
-    padding: 12,
+    padding: 6,
     textAlign: "center",
-    backgroundColor: "#FFFFFF",
-    fontSize: 16,
+    backgroundColor: "#ddddddff",
+    fontSize: 15,
   },
   result: {
     fontSize: 24,
@@ -667,8 +690,9 @@ const styles = StyleSheet.create({
   },
   gameButtonGroup: {
     flexDirection: "row",
-    width: "90%",
+    width: "85%",
     marginTop: 15,
+    marginBottom:20,
   },
 })
 

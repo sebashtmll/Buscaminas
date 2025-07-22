@@ -102,19 +102,20 @@ const Cell = ({ cell, size, onPress, onLongPress, disabled, gameOver }) => {
       width: size,
       height: size,
       borderWidth: 2,
-      borderColor: "#2C3E50",
+      borderColor: "#282639",
       justifyContent: "center",
       alignItems: "center",
-      borderRadius: 4,
+      borderRadius: 6,
+      margin:0.4,
     }
 
     if (cell.revealed) {
       if (cell.value === "mine") {
         return [baseStyle, { backgroundColor: "#E74C3C" }]
       }
-      return [baseStyle, { backgroundColor: "#ECF0F1", borderColor: "#BDC3C7" }]
+      return [baseStyle, { backgroundColor: "#C4C4C4" }]
     }
-    return [baseStyle, { backgroundColor: "#3498DB", borderColor: "#2980B9" }]
+    return [baseStyle, { backgroundColor: "#6e6e75ff" }]
   }
 
   const getTextStyle = () => {
